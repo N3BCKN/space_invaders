@@ -78,7 +78,7 @@ player_shots = []
 enemies_shots = []
 enemies = []
 castles  = []
-lifes = 3
+lifes = 0
 tick = Time.now.strftime('%s%L')
 
 6.times do |i|
@@ -96,6 +96,10 @@ tick = Time.now.strftime('%s%L')
     enemies << Enemy.new(x,y, color)
   end
 end 
+
+def game_over? 
+  lifes > 0 && enemies.any?
+end
 
 update do 
   clear 
@@ -157,7 +161,7 @@ update do
 end  
 
 on :key_held do |event|
-  if lifes > 0 && enemies.any?
+  if game_over?
     if event.key == 'left'
       player.move_left
     elsif event.key == 'right'
@@ -167,7 +171,7 @@ on :key_held do |event|
 end
 
 on :key_down do |event| 
-  if lifes > 0 && enemies.any?
+  if game_over?
     if event.key == 'space' && tick.to_i + 400 <= Time.now.strftime('%s%L').to_i
       tick = Time.now.strftime('%s%L')
       player_shots << Shot.new(player.x + 30, player.y, 'up')
