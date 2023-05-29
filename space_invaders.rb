@@ -54,6 +54,10 @@ update do
     next
   end
 
+  if enemies.any? {|enemy| enemy.y >= player.y - 30 }
+    lifes = 0
+  end
+
   if Window.frames % 30 == 0 
     enemies.each(&:move_right)
   end
