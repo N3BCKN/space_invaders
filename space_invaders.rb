@@ -17,14 +17,13 @@ player = Ship.new
 player_shots = []
 enemies_shots = []
 enemies = []
-castles  = []
-lifes = 3
+lives = 3
 tick = Time.now.strftime('%s%L')
 
 6.times do |i|
   if i == 0 || i == 1
     color = 'yellow'
-  elsif i == 2 
+  elsif i == 2 || i == 3
     color = 'green'
   else 
     color = 'red'
@@ -42,9 +41,9 @@ update do
   player.draw
   enemies.each(&:draw)
 
-  Text.new(lifes, x: 10, y: 0, size: 30, color: 'white')
+  Text.new(lives, x: 10, y: 0, size: 30, color: 'white')
 
-  if lifes == 0 
+  if lives == 0 
     Text.new('GAME OVER', x: WIDTH/2 -150, y: HEIGHT/2, size: 50, color: 'red')
     next
   end 
@@ -55,15 +54,16 @@ update do
   end
 
   if enemies.any? {|enemy| enemy.y >= player.y - 30 }
-    lifes = 0
+    lives = 0
   end
 
   if Window.frames % 30 == 0 
     enemies.each(&:move_right)
   end
 
-  if Window.frames % rand(45..60) == 0  
-    x,y = enemies.last.x, enemies.last.y 
+  if Window.frames % rand(30..45) == 0 
+    enemy = enemies.sample 
+    x,y = enemy.x, enemy.y 
     enemies_shots << Shot.new(x + 23, y, 'down')
   end 
 
@@ -76,7 +76,7 @@ update do
     shot.move
 
     if (player.x..player.x+60).include?(shot.x) && (player.y..player.y+30).include?(shot.y)
-      lifes -= 1
+      lives -= 1
       enemies_shots.reject!.with_index{|_, i| i == index }
     end
 
@@ -95,14 +95,13 @@ update do
         break
       end
     end
-
     #remove shot from array if it reaches max height
     player_shots.reject!.with_index{|_, i| i == index } unless (0...HEIGHT).include? shot.y 
   end
 end  
 
 on :key_held do |event|
-  unless lifes == 0 || enemies.empty?
+  unless lives == 0 || enemies.empty?
     if event.key == 'left'
       player.move_left
     elsif event.key == 'right'
@@ -112,7 +111,7 @@ on :key_held do |event|
 end
 
 on :key_down do |event| 
-  unless lifes == 0 || enemies.empty?
+  unless lives == 0 || enemies.empty?
     if event.key == 'space' && tick.to_i + SHOT_DELAY <= Time.now.strftime('%s%L').to_i
       tick = Time.now.strftime('%s%L')
       player_shots << Shot.new(player.x + 30, player.y, 'up')
